@@ -29,14 +29,27 @@ const transactions = [
 ]
 
 const Transaction = {
-    incomes() { //somar as entradas
-
+    incomes() {
+        let income = 0
+        transactions.forEach(transaction =>  {
+            if (transaction.amount > 0) {
+                income += transaction.amount
+            }
+        })
+        return income
     },
-    expenses() { //somar as saídas
-
+    expenses() {
+        let expense = 0
+        transactions.forEach(transaction =>  {
+            if (transaction.amount < 0) {
+                expense += transaction.amount
+            }
+        })
+        return expense
     },
-    total() { //entradas - saídas
-
+    total() {
+        let total = Transaction.incomes() + Transaction.expenses()
+        return total
     }
 }
 
@@ -53,19 +66,55 @@ const DOM = {
     innerHTMLTransaction(transaction) {
         const cssClass = transaction.amount > 0 ? "income" : "expense"
 
+        const amount = utils.formatCurrency(transaction.amount)
 
         const html = `
         <td class="description">${transaction.description}</td>
-        <td class="${cssClass}">${transaction.amount}</td>
+        <td class="${cssClass}">${amount}</td>
         <td class="date">${transaction.date}</td>
         <td>
             <img src="./assets/minus.svg" alt="Remover Transação">
         </td>
         `
         return html
+    },
+
+    updateBalance() {
+        document.
+        querySelector('#incomeDisplay')
+        .innerHTML = Transaction.incomes()
+
+        document.
+        querySelector('#expenseDisplay')
+        .innerHTML = Transaction.expenses()
+
+        document.
+        querySelector('#totalDisplay')
+        .innerHTML = Transaction.total()
+
+    }
+}
+
+
+
+const utils = {
+    formatCurrency(value) {
+        const signal = Number(value) < 0? "-" : ""
+
+        value = String(value).replace(/\D/g, "")
+
+        value = Number(value) / 100
+
+        value = value.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        })
+        return `${signal} ${value}`
     }
 }
 
 transactions.forEach(function(transaction) {
     DOM.addTransaction(transaction)
 })
+
+DOM.updateBalance()
