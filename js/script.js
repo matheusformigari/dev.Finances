@@ -9,19 +9,16 @@ const modal = {
 
 const transactions = [
     {
-        id: 1,
         description: 'Luz',
         amount: -50000,
         date: '23/01/2021'
     },
     {
-        id: 2,
         description: 'Website',
         amount: 500000,
         date: '23/01/2021'
     },
     {
-        id: 3,
         description: 'Internet',
         amount: -20000,
         date: '23/01/2021'
@@ -29,24 +26,41 @@ const transactions = [
 ]
 
 const Transaction = {
+    all: transactions,
+
+    add(transaction) {
+        Transaction.all.push(transaction)
+
+        app.reload()
+    },
+
+    remove(index) {
+        Transaction.all.splice(index, 1)
+
+        app.reload()
+
+    },
+
     incomes() {
         let income = 0
-        transactions.forEach(transaction =>  {
+        Transaction.all.forEach(transaction =>  {
             if (transaction.amount > 0) {
                 income += transaction.amount
             }
         })
         return income
     },
+
     expenses() {
         let expense = 0
-        transactions.forEach(transaction =>  {
+        Transaction.all.forEach(transaction =>  {
             if (transaction.amount < 0) {
                 expense += transaction.amount
             }
         })
         return expense
     },
+
     total() {
         let total = Transaction.incomes() + Transaction.expenses()
         return total
@@ -82,17 +96,22 @@ const DOM = {
     updateBalance() {
         document.
         querySelector('#incomeDisplay')
-        .innerHTML = Transaction.incomes()
+        .innerHTML = utils.formatCurrency(Transaction.incomes())
 
         document.
         querySelector('#expenseDisplay')
-        .innerHTML = Transaction.expenses()
+        .innerHTML = utils.formatCurrency(Transaction.expenses())
 
         document.
         querySelector('#totalDisplay')
-        .innerHTML = Transaction.total()
+        .innerHTML = utils.formatCurrency(Transaction.total())
 
+    },
+
+    clearTransactions() {
+        DOM.TransactionsContainer.innerHTML = ""
     }
+
 }
 
 
@@ -113,8 +132,20 @@ const utils = {
     }
 }
 
-transactions.forEach(function(transaction) {
-    DOM.addTransaction(transaction)
-})
+const app = {
+    init() {
+        Transaction.all.forEach(transaction => {
+            DOM.addTransaction(transaction)
+        })
+        
+        DOM.updateBalance()
+    },
 
-DOM.updateBalance()
+    reload(){
+        DOM.clearTransactions()
+        app.init()
+    },
+}
+
+
+app.init()
